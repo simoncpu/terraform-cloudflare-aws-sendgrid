@@ -55,6 +55,10 @@ resource "cloudflare_record" "SESDKIM" {
 
 resource "aws_s3_bucket" "mailbox" {
   bucket = var.aws_s3_bucket_name
+}
+
+resource "aws_s3_bucket_acl" "mailbox" {
+  bucket = aws_s3_bucket.mailbox.id
   acl    = "private"
 }
 
