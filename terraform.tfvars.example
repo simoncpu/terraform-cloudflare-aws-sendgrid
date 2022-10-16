@@ -1,0 +1,8 @@
+domain="example.org"
+email_recipients=["support@example.org", "simoncpu@example.com"]
+cloudflare_account_id=""
+cloudflare_api_token=""
+aws_region="us-east-1"
+aws_access_key=""
+aws_secret_key=""
+aws_s3_bucket_name="example-bucket-name"
