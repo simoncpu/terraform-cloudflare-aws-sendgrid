@@ -56,6 +56,7 @@ resource "cloudflare_record" "SESDKIM" {
 
 resource "aws_s3_bucket" "mailbox" {
   bucket = var.aws_s3_bucket_name
+  force_destroy = var.aws_s3_force_destroy
 }
 
 resource "aws_s3_bucket_acl" "mailbox" {

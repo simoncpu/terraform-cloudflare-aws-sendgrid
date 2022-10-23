@@ -37,3 +37,8 @@ variable "aws_s3_bucket_name" {
   type        = string
   description = "The emails will be stored in this S3 bucket."
 }
+
+variable "aws_s3_force_destroy" {
+  type        = bool
+  default     = false
+}
