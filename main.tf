@@ -55,7 +55,7 @@ resource "cloudflare_record" "SESDKIM" {
 # Create S3 bucket for receiving emails
 
 resource "aws_s3_bucket" "mailbox" {
-  bucket = var.aws_s3_bucket_name
+  bucket        = var.aws_s3_bucket_name
   force_destroy = var.aws_s3_force_destroy
 }
 
@@ -110,4 +110,40 @@ resource "aws_ses_receipt_rule" "main" {
 # Activate rule set
 resource "aws_ses_active_receipt_rule_set" "main" {
   rule_set_name = aws_ses_receipt_rule_set.main.rule_set_name
+}
+
+resource "sendgrid_subuser" "subuser" {
+  username = var.sendgrid_username
+  email    = var.sendgrid_email
+  password = var.sendgrid_password
+  ips      = [var.sendgrid_ip]
+}
+
+resource "sendgrid_domain_authentication" "domain" {
+  domain             = var.domain
+  subdomain          = var.sub_domain
+  automatic_security = true
+  valid              = true
+}
+
+resource "cloudflare_record" "domain" {
+  count   = 3
+  zone_id = cloudflare_zone.domain.id
+  name    = sendgrid_domain_authentication.domain.dns[count.index].host
+  value   = sendgrid_domain_authentication.domain.dns[count.index].data
+  type    = upper(sendgrid_domain_authentication.domain.dns[count.index].type)
+  proxied = false
+}
+
+# Manually verify the domain via curl because the Terraform module doesn't support this yet.
+resource "null_resource" "auth-verification" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      curl -s \
+      -X POST 'https://api.sendgrid.com/v3/whitelabel/domains/${sendgrid_domain_authentication.domain.id}/validate' \
+      --header 'Authorization: Bearer ${var.sendgrid_api_key}'
+    EOT
+  }
+
+  depends_on = [cloudflare_record.domain]
 }
