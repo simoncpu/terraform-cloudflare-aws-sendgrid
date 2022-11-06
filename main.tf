@@ -54,13 +54,12 @@ resource "cloudflare_record" "SESDKIM" {
 
 # Create S3 bucket for receiving emails
 
-resource "aws_s3_bucket" "mailbox" {
-  bucket        = "${var.aws_s3_bucket_name}/${var.domain}"
-  force_destroy = var.aws_s3_force_destroy
+data "aws_s3_bucket" "mailbox" {
+  bucket = var.aws_s3_bucket_name
 }
 
 resource "aws_s3_bucket_acl" "mailbox" {
-  bucket = aws_s3_bucket.mailbox.id
+  bucket = data.aws_s3_bucket.mailbox.id
   acl    = "private"
 }
 
@@ -74,12 +73,12 @@ data "aws_iam_policy_document" "mailbox" {
     actions = [
       "s3:PutObject"
     ]
-    resources = ["${aws_s3_bucket.mailbox.arn}/*"]
+    resources = ["${data.aws_s3_bucket.mailbox.arn}/*"]
   }
 }
 
 resource "aws_s3_bucket_policy" "mailbox" {
-  bucket = aws_s3_bucket.mailbox.id
+  bucket = data.aws_s3_bucket.mailbox.id
   policy = data.aws_iam_policy_document.mailbox.json
 }
 
