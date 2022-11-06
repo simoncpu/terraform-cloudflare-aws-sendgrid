@@ -3,7 +3,7 @@ output "cloudflare_zone" {
   description = "Cloudflare Zone resource."
 }
 
-output "sendgrid_domain_authentication.domain.id" {
+output "sendgrid_domain_authentication_domain_id" {
   value       = sendgrid_domain_authentication.domain
   description = "SendGrid domain authentication"
 }
