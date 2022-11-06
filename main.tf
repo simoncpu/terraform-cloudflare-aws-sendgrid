@@ -55,7 +55,7 @@ resource "cloudflare_record" "SESDKIM" {
 # Create S3 bucket for receiving emails
 
 resource "aws_s3_bucket" "mailbox" {
-  bucket        = var.aws_s3_bucket_name
+  bucket        = "${var.aws_s3_bucket_name}/${var.domain}"
   force_destroy = var.aws_s3_force_destroy
 }
 
@@ -86,11 +86,11 @@ resource "aws_s3_bucket_policy" "mailbox" {
 
 # Create a new rule set
 resource "aws_ses_receipt_rule_set" "main" {
-  rule_set_name = var.aws_s3_bucket_name
+  rule_set_name = var.domain
 }
 
 resource "aws_ses_receipt_rule" "main" {
-  name          = "s3"
+  name          = "mailbox"
   rule_set_name = aws_ses_receipt_rule_set.main.rule_set_name
   recipients    = var.email_recipients
   enabled       = true
